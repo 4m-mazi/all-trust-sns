@@ -10,7 +10,3 @@
 ## Preview
 
 ![スクリーンショット 2023-10-18 3 55 30](https://github.com/4m-mazi/all-trust-sns/assets/33943897/f23d6668-90cb-45e8-b872-0f1304e3059e)
-
-
-
-https://www.youtube.com/watch?v=G90lKqDBIac
