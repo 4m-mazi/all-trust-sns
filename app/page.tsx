@@ -1,4 +1,5 @@
 'use client';
+import { VolumeDown, VolumeUp } from '@mui/icons-material';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import {
   Avatar,
@@ -10,69 +11,73 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Slider,
   Stack,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
+import {
+  DocumentData,
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { uuid } from 'uuidv4';
+import UsernameDialog from '../components/usernameDialog';
+import { db } from '../lib/firebase';
 import styles from './page.module.css';
 
 // Import the functions you need from the SDKs you need
 
 export default function Home() {
-  const [posts, setPosts] = useState([
-    {
-      id: uuid(),
-      username: 'お前の名前',
-      text: 'Hello world',
-      timestamp: new Date().toISOString(),
-    },
-  ]);
+  const [posts, setPosts] = useState<DocumentData[]>([]);
+  const [user, setUser] = useState<DocumentData>();
   const [input, setInput] = useState('');
-
-  const firebaseConfig = {
-    apiKey: 'AIzaSyCtwQsjRg6eFfIbrTmAeU-crKep_cSQF6Q',
-    authDomain: 'all-trust-sns.firebaseapp.com',
-    projectId: 'all-trust-sns',
-    storageBucket: 'all-trust-sns.appspot.com',
-    messagingSenderId: '291700971474',
-    appId: '1:291700971474:web:95d0d5691fb97c4c6e5a0b',
-    measurementId: 'G-ST4KTTQE6B',
+  const fetchData = async () => {
+    const q = query(
+      collection(db, 'posts'),
+      orderBy('timestamp', 'desc'),
+      limit(30),
+    );
+    const snapshot = await getDocs(q);
+    const posts = snapshot.docs.map((doc) => doc.data());
+    return posts;
   };
 
-  // const app = initializeApp(firebaseConfig);
-  // const db = getFirestore();
-  // const analytics = getAnalytics(app);
-
-  const handlePost = async () => {
+  const fetchUser = async () => {
+    const docRef = doc(db, 'user', 'all-trust-user');
     try {
-      // const docRef = await addDoc(collection(db, 'posts'), {
-      //   text: input,
-      //   timestamp: new Date().toISOString(),
-      // });
-      setPosts([
-        ...posts,
-        {
-          id: uuid(),
-          username: 'お前の名前',
-          text: input,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+      const doc = await getDoc(docRef);
+      return doc.data();
     } catch (e) {
-      console.error('Error adding document: ', e);
+      console.log('Error getting cached document:', e);
     }
   };
 
   useEffect(() => {
-    // const fetchPosts = async () => {
-    //   const querySnapshot = await getDocs(collection(db, 'posts'));
-    //   setPosts(querySnapshot.docs.map((doc) => doc.data()));
-    // };
-    // fetchPosts();
+    fetchData().then((posts) => setPosts(posts));
+    fetchUser().then((user) => setUser(user));
   }, []);
+
+  const handlePost = async () => {
+    try {
+      const postsRef = collection(db, 'posts');
+      await addDoc(postsRef, {
+        text: input,
+        timestamp: new Date().toISOString(),
+      });
+      fetchData().then((posts) => setPosts(posts));
+      setInput('');
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+  };
 
   return (
     <main className={styles.main}>
@@ -85,10 +90,13 @@ export default function Home() {
           justifyContent="space-between"
         >
           <Box>
-            <Avatar />
+            <Avatar
+              alt="haruka"
+              src="https://pbs.twimg.com/profile_images/1676935943499165696/CQfBVnXa_400x400.jpg"
+            />
           </Box>
           <Tooltip title="変な名前つけんな">
-            <Typography>お前の名前</Typography>
+            <UsernameDialog name={user?.username as string} />
           </Tooltip>
           <Tooltip title="押せると思うなよゴミが" arrow>
             <FingerprintIcon color="secondary" />
@@ -115,6 +123,11 @@ export default function Home() {
             </Button>
           </Tooltip>
         </Box>
+        <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+          <VolumeDown />
+          <Slider disabled defaultValue={30} aria-label="Disabled slider" />
+          <VolumeUp />
+        </Stack>
         <List
           sx={{
             width: '100%',
@@ -126,10 +139,13 @@ export default function Home() {
             <Box key={post.timestamp}>
               <ListItem alignItems="flex-start">
                 <ListItemAvatar>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                  <Avatar
+                    alt="haruka"
+                    src="https://pbs.twimg.com/profile_images/1676935943499165696/CQfBVnXa_400x400.jpg"
+                  />
                 </ListItemAvatar>
                 <ListItemText
-                  primary="Brunch this weekend?"
+                  primary={user?.username}
                   secondary={
                     <Typography
                       sx={{ display: 'inline' }}

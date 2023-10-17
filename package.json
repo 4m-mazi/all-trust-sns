@@ -20,7 +20,6 @@
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {
-    "@kuma-ui/next-plugin": "^1.1.11",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
