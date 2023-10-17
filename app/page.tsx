@@ -95,9 +95,7 @@ export default function Home() {
               src="https://pbs.twimg.com/profile_images/1676935943499165696/CQfBVnXa_400x400.jpg"
             />
           </Box>
-          <Tooltip title="変な名前つけんな">
-            <UsernameDialog name={user?.username as string} />
-          </Tooltip>
+          <UsernameDialog name={user?.username as string} />
           <Tooltip title="押せると思うなよゴミが" arrow>
             <FingerprintIcon color="secondary" />
           </Tooltip>
