@@ -70,7 +70,7 @@ export default function Home() {
       const postsRef = collection(db, 'posts');
       await addDoc(postsRef, {
         text: input,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
       });
       fetchData().then((posts) => setPosts(posts));
       setInput('');
