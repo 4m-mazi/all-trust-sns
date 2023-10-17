@@ -9,11 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@kuma-ui/core": "^1.5.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.14",
+    "@mui/material": "^5.14.14",
     "firebase": "^10.5.0",
     "next": "13.5.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "@kuma-ui/next-plugin": "^1.1.11",
