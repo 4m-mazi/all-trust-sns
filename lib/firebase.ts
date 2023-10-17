@@ -1,4 +1,9 @@
-import firebase, { initializeApp } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
+import {
+  ReCaptchaV3Provider,
+  getToken,
+  initializeAppCheck,
+} from 'firebase/app-check';
 import 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 
@@ -13,9 +18,33 @@ const firebaseConfig = {
   measurementId: 'G-ST4KTTQE6B',
 };
 
-if (typeof window !== undefined) {
-  initializeApp(firebaseConfig);
+export const firebase =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+declare global {
+  var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean | string | undefined;
+}
+
+if (typeof document !== 'undefined') {
+  if (process.env.NODE_ENV === 'development') {
+    window.self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+
+  const appCheck = initializeAppCheck(firebase, {
+    provider: new ReCaptchaV3Provider(
+      '6LdzG6woAAAAAHQM0G-v57ZFxT37KkSW6P6dmCSa',
+    ),
+    isTokenAutoRefreshEnabled: true,
+  });
+
+  getToken(appCheck)
+    .then(() => {
+      console.log('AppCheck:Success');
+    })
+    .catch((error) => {
+      console.log(error.message);
+    });
 }
 const db = getFirestore();
 
-export { db, firebase };
+export { db };
